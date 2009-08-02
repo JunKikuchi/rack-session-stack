@@ -2,15 +2,15 @@ require 'rubygems'
 require 'rake/gempackagetask'
 require 'spec/rake/spectask'
 
-NAME = 'raws'
+NAME = 'rack-session-stack'
 VERS = '0.0.1'
 
-desc 'Packages raws'
+desc 'Packages rack-session-stack'
 spec = Gem::Specification.new do |s|
   s.name = NAME
   s.version = VERS
   s.platform = Gem::Platform::RUBY
-  s.summary = "RAWS"
+  s.summary = "rack-session-stack"
   s.description = s.summary
   s.author = "Jun Kikuchi"
   s.email = "kikuchi@bonnou.com"
