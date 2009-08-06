@@ -1,6 +1,6 @@
 = rack-session-stack
 
-== Memcache -> RAWS::SDB
+== Memcache から RAWS::SDB へフォールバック
 
   require 'rubygems'
   require 'sinatra'
