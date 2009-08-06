@@ -2,7 +2,7 @@ require 'raws'
 require 'time'
 
 class Rack::Session::Stack::RAWS::SDB < Rack::Session::Stack::Base
-  attr_reader :mutex, :pool
+  attr_reader :pool
   PARAMS = {:domain => nil}
 
   def initialize(params={}, fallback=nil)

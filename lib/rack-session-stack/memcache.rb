@@ -1,7 +1,7 @@
 require 'memcache'
 
 class Rack::Session::Stack::Memcache < Rack::Session::Stack::Base
-  attr_reader :mutex, :pool
+  attr_reader :pool
   PARAMS = {:server => 'localhost:11211'}
 
   def initialize(params={}, fallback=nil)
