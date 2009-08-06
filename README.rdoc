@@ -1,5 +1,7 @@
 = rack-session-stack
 
+== Memcache -> RAWS::SDB
+
   require 'rubygems'
   require 'sinatra'
   require 'rack-session-stack'
@@ -27,7 +29,7 @@
     "cnt = #{session['cnt']}"
   end
 
-
+= Memcache
 
   require 'rubygems'
   require 'sinatra'
@@ -48,7 +50,7 @@
     "cnt = #{session['cnt']}"
   end
 
-
+== RAWS::SDB
 
   require 'rubygems'
   require 'sinatra'
