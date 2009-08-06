@@ -2,8 +2,9 @@
 
 == Memcache から RAWS::SDB へフォールバック
 
-セッション情報を書き込む場合は Memcache と RAWS::SDB へ書き込む。
-セッション情報を読み込む場合は Memcache から読めれば Memcache のデータを使って、Memcache から読めなかったら RAWS::SDB から読み込む。
+セッション情報を書き込む場合は Memcache と RAWS::SDB 全てに書き込みます。
+
+セッション情報を読み込む場合、最初に Memcache から読み込みます。データが取得出来れば Memcache のデータを使い、データが取得出来なかった場合は RAWS::SDB からデータを読み込んで使います。
 
   require 'rubygems'
   require 'sinatra'
