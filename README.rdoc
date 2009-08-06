@@ -1,0 +1,75 @@
+= rack-session-stack
+
+  require 'rubygems'
+  require 'sinatra'
+  require 'rack-session-stack'
+  
+  require 'raws'
+  RAWS.aws_access_key_id = _AWS_ACCESS_KEY_ID_
+  RAWS.aws_secret_access_key = _AWS_SECRET_ACCESS_KEY_
+  RAWS::SDB.create_domain 'session'
+  
+  use Rack::Session::Stack,
+    :stack => Rack::Session::Stack::Memcache.new(
+      {:server => 'localhost:11211'},
+      Rack::Session::Stack::RAWS::SDB.new(
+        {:domain => 'session'}
+      )
+    )
+  
+  get '/' do
+    if session['cnt']
+      session['cnt'] += 1
+    else
+      session['cnt']  = 1
+    end
+  
+    "cnt = #{session['cnt']}"
+  end
+
+
+
+  require 'rubygems'
+  require 'sinatra'
+  require 'rack-session-stack'
+  
+  use Rack::Session::Stack,
+    :stack => Rack::Session::Stack::Memcache.new(
+      {:server => 'localhost:11211'},
+    )
+  
+  get '/' do
+    if session['cnt']
+      session['cnt'] += 1
+    else
+      session['cnt']  = 1
+    end
+  
+    "cnt = #{session['cnt']}"
+  end
+
+
+
+  require 'rubygems'
+  require 'sinatra'
+  require 'rack-session-stack'
+  
+  require 'raws'
+  RAWS.aws_access_key_id = _AWS_ACCESS_KEY_ID_
+  RAWS.aws_secret_access_key = _AWS_SECRET_ACCESS_KEY_
+  RAWS::SDB.create_domain 'session'
+  
+  use Rack::Session::Stack,
+    :stack => Rack::Session::Stack::RAWS::SDB.new(
+      {:domain => 'session'}
+    )
+  
+  get '/' do
+    if session['cnt']
+      session['cnt'] += 1
+    else
+      session['cnt']  = 1
+    end
+  
+    "cnt = #{session['cnt']}"
+  end
