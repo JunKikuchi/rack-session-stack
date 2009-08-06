@@ -41,7 +41,7 @@
   
   use Rack::Session::Stack,
     :stack => Rack::Session::Stack::Memcache.new(
-      {:server => 'localhost:11211'},
+      :server => 'localhost:11211'
     )
   
   get '/' do
@@ -67,7 +67,7 @@
   
   use Rack::Session::Stack,
     :stack => Rack::Session::Stack::RAWS::SDB.new(
-      {:domain => 'session'}
+      :domain => 'session'
     )
   
   get '/' do
