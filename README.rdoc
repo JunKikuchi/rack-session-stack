@@ -1,5 +1,7 @@
 = rack-session-stack
 
+セッションの保存先を積み重ねられたらどうかと思ってやってみた。
+
 == Memcache から RAWS::SDB へフォールバック
 
 セッション情報を書き込む場合は Memcache と RAWS::SDB 全てに書き込みます。
