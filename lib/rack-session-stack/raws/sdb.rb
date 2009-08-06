@@ -1,12 +1,13 @@
 require 'raws'
+require 'time'
 
-class Rack::Session::Stack::SDB < Rack::Session::Stack::Base
+class Rack::Session::Stack::RAWS::SDB < Rack::Session::Stack::Base
   attr_reader :mutex, :pool
   PARAMS = {:domain => nil}
 
   def initialize(params={}, fallback=nil)
     super
-    @pool = RAWS::SDB[@params[:domain]]
+    @pool = ::RAWS::SDB[@params[:domain]]
   end
 
   def key?(sid)
@@ -24,8 +25,12 @@ class Rack::Session::Stack::SDB < Rack::Session::Stack::Base
   def []=(sid, session)
     @pool.put(
       sid,
-      {'session' => [Marshal.dump(session)].pack('m*')},
-      'session'
+      {
+        'session' => [Marshal.dump(session)].pack('m*'),
+        'updated' => Time.now.utc.iso8601
+      },
+      'session',
+      'updated'
     )
     super
   end

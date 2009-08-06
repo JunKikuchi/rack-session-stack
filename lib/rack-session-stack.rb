@@ -59,8 +59,11 @@ module Rack
         end
       end
 
-      autoload :SDB,      'lib/rack-session-stack/sdb'
-      autoload :Memcache, 'lib/rack-session-stack/memcache'
+      autoload :Memcache, 'rack-session-stack/memcache'
+
+      module RAWS
+        autoload :SDB, 'rack-session-stack/raws/sdb'
+      end
     end
   end
 end
