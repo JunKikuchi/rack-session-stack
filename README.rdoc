@@ -2,15 +2,29 @@
 
 セッションの保存先を積み重ねられたらどうかと思ってやってみた。
 
-== Memcache から RAWS::SDB へフォールバック
+== Memcache から Sequel さらに RAWS::SDB へフォールバック
 
-セッション情報を書き込む場合は Memcache と RAWS::SDB 全てに書き込みます。
+これは 3 段重ねの極端な例です。あらかじめご了承下さい。
 
-セッション情報を読み込む場合、最初に Memcache から読み込みます。データが取得出来れば Memcache のデータを使い、データが取得出来なかった場合は RAWS::SDB からデータを読み込んで使います。
+セッション情報を書き込む場合は Memcache と Sequel, RAWS::SDB の全てに書き込みます。
+
+セッション情報を読み込む場合は、最初に Memcache から読み込みます。データが取得出来れば Memcache のデータを使い、データが取得出来なかった場合は Sequel からデータを読み込んで使います。Sequel からデータを取得出来なかった場合は RAWS::SDB へと同様にフォールバックします。
+
+書き込みは遅いのですが、読み込みはそこそこ。
 
   require 'rubygems'
   require 'sinatra'
   require 'rack-session-stack'
+
+  require 'sequel'
+  DB = Sequel.sqlite
+  DB.create_table(:session) do
+    primary_key :id
+    String :sid, :unique => true, :null => false
+    Datetime :created
+    Datetime :updated
+    column :session, File
+  end
   
   require 'raws'
   RAWS.aws_access_key_id = _AWS_ACCESS_KEY_ID_
@@ -20,8 +34,11 @@
   use Rack::Session::Stack,
     :stack => Rack::Session::Stack::Memcache.new(
       {:server => 'localhost:11211'},
-      Rack::Session::Stack::RAWS::SDB.new(
-        {:domain => 'session'}
+      Rack::Session::Stack::Sequel.new(
+        {:dataset => DB[:session]},
+        Rack::Session::Stack::RAWS::SDB.new(
+          {:domain => 'session'}
+        )
       )
     )
   
@@ -36,6 +53,8 @@
   end
 
 = Memcache
+
+Memcache を単体で使う場合。
 
   require 'rubygems'
   require 'sinatra'
@@ -56,7 +75,42 @@
     "cnt = #{session['cnt']}"
   end
 
+= Sequel
+
+Sequel を単体で使う場合。
+
+  require 'rubygems'
+  require 'sinatra'
+  require 'rack-session-stack'
+
+  require 'sequel'
+  DB = Sequel.sqlite
+  DB.create_table(:session) do
+    primary_key :id
+    String :sid, :unique => true, :null => false
+    Datetime :created
+    Datetime :updated
+    column :session, File
+  end
+  
+  use Rack::Session::Stack,
+    :stack => Rack::Session::Stack::Sequel.new(
+      {:dataset => DB[:session]},
+    )
+  
+  get '/' do
+    if session['cnt']
+      session['cnt'] += 1
+    else
+      session['cnt']  = 1
+    end
+  
+    "cnt = #{session['cnt']}"
+  end
+
 == RAWS::SDB
+
+RAWS::SDB を単体で使う場合。
 
   require 'rubygems'
   require 'sinatra'
