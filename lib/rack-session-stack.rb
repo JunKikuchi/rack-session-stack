@@ -22,20 +22,59 @@ module Rack
       def get_session(env, sid)
         session = @stack[sid] if sid
         @mutex.lock if env['rack.multithread']
-        sid, session = generate_sid, {} unless sid && session
-        @old = {}.merge(session)
+        unless sid && session
+          env['rack.errors'].puts(
+            "Session '#{sid.inspect}' not found, initializing..."
+          ) if $VERBOSE && !sid.nil?
+          sid, session = generate_sid, {}
+          @stack.create(sid, session)
+        end
+        session.instance_variable_set('@old', {}.merge(session))
         return [sid, session]
       ensure
         @mutex.unlock if env['rack.multithread']
       end
 
-      def set_session(env, sid, session, options)
+      def set_session(env, sid, new_session, options)
         @mutex.lock if env['rack.multithread']
-        @stack[sid] = session if @old != session
+        session = @stack[sid] || {}
+        if options[:renew] || options[:drop]
+          @stack.delete(sid)
+          return false if options[:drop]
+          sid = generate_sid
+          @stack.create(sid, session)
+        end
+        old_session = new_session.instance_variable_get('@old') || {}
+        session = merge_sessions(sid, old_session, new_session, session)
+        @stack[sid] = session
         return sid
       ensure
         @mutex.unlock if env['rack.multithread']
       end
+
+      def merge_sessions(sid, old, new, cur=nil)
+        cur ||= {}
+
+        unless old.is_a?(Hash) && new.is_a?(Hash)
+          warn('Bad old or new sessions provided.')
+          return cur
+        end
+
+        delete = old.keys - new.keys
+        if $VERBOSE && !delete.empty?
+          warn("//@#{sid}: delete #{delete*','}")
+        end
+        delete.each{|k| cur.delete k }
+
+        update = new.keys.select{|k| new[k] != old[k] }
+        if $VERBOSE && !update.empty?
+          warn("//@#{sid}: update #{update*','}")
+        end
+        update.each{|k| cur[k] = new[k] }
+
+        cur
+      end
+      private :merge_sessions
 
       class Base
         PARAMS = {}
@@ -46,6 +85,14 @@ module Rack
 
         def key?(sid)
           @fallback && @fallback.key?(sid)
+        end
+
+        def create(sid, session)
+          @fallback && @fallback.create(sid, session)
+        end
+
+        def delete(sid)
+          @fallback && @fallback.delete(sid)
         end
 
         def [](sid)
@@ -60,6 +107,7 @@ module Rack
       end
 
       autoload :Memcache, 'rack-session-stack/memcache'
+      autoload :Sequel,   'rack-session-stack/sequel'
 
       module RAWS
         autoload :SDB, 'rack-session-stack/raws/sdb'

@@ -14,6 +14,18 @@ class Rack::Session::Stack::Memcache < Rack::Session::Stack::Base
     @pool.get(sid, true)
   end
 
+  def create(sid, session)
+    unless /^STORED/ =~ @pool.create(sid, session)
+      raise "Session collision on '#{sid.inspect}'"
+    end
+    super
+  end
+
+  def delete(sid)
+    @pool.delete(sid)
+    super
+  end
+
   def [](sid)
     if data = @pool.get(sid)
       data
