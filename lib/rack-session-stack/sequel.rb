@@ -29,19 +29,24 @@ class Rack::Session::Stack::Sequel < Rack::Session::Stack::Base
     super
   end
 
-  def [](sid)
-    if data = @pool.filter('sid = ?', sid).first
-      Marshal.load(data[:session].unpack("m*").first)
-    else
-      super
-    end
-  end
-
-  def []=(sid, session)
+  def store(sid, session)
     @pool.filter('sid = ?', sid).update(
       :session => [Marshal.dump(session)].pack('m*'),
       :updated => Time.now.utc
     )
+    session
+  end
+
+  def [](sid)
+    if data = @pool.filter('sid = ?', sid).first
+      Marshal.load(data[:session].unpack("m*").first)
+    else
+      store(sid, super)
+    end
+  end
+
+  def []=(sid, session)
+    store(sid, session)
     super
   end
 end

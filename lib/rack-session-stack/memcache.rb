@@ -15,7 +15,7 @@ class Rack::Session::Stack::Memcache < Rack::Session::Stack::Base
   end
 
   def create(sid, session)
-    unless /^STORED/ =~ @pool.create(sid, session)
+    unless /^STORED/ =~ @pool.add(sid, session)
       raise "Session collision on '#{sid.inspect}'"
     end
     super
@@ -27,9 +27,7 @@ class Rack::Session::Stack::Memcache < Rack::Session::Stack::Base
   end
 
   def [](sid)
-    if data = @pool.get(sid)
-      data
-    else
+    @pool.fetch(sid) do
       super
     end
   end

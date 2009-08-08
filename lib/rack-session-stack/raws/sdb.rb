@@ -34,15 +34,7 @@ class Rack::Session::Stack::RAWS::SDB < Rack::Session::Stack::Base
     super
   end
 
-  def [](sid)
-    if data = @pool.get(sid)
-      Marshal.load(data['session'].unpack("m*").first)
-    else
-      super
-    end
-  end
-
-  def []=(sid, session)
+  def store(sid, session)
     @pool.put(
       sid,
       {
@@ -52,6 +44,19 @@ class Rack::Session::Stack::RAWS::SDB < Rack::Session::Stack::Base
       'session',
       'updated'
     )
+    session
+  end
+
+  def [](sid)
+    if data = @pool.get(sid)
+      Marshal.load(data['session'].unpack("m*").first)
+    else
+      store(sid, super)
+    end
+  end
+
+  def []=(sid, session)
+    store(sid, session)
     super
   end
 end

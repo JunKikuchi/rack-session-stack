@@ -96,8 +96,7 @@ module Rack
         end
 
         def [](sid)
-          session = @fallback && @fallback[sid]
-          self[sid] = session if session
+          @fallback && @fallback[sid]
         end
 
         def []=(sid, session)
