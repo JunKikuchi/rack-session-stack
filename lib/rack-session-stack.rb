@@ -3,12 +3,10 @@ require 'rack/session/abstract/id'
 module Rack
   module Session
     class Stack < Abstract::ID
-      attr_reader :mutex
-      DEFAULT_OPTIONS = Abstract::ID::DEFAULT_OPTIONS.merge :stack => nil
+      DEFAULT_OPTIONS = Abstract::ID::DEFAULT_OPTIONS.merge(:stack => nil)
 
       def initialize(app, options={})
         super
-        @mutex = Mutex.new
         @stack = @default_options[:stack]
       end
 
@@ -20,61 +18,31 @@ module Rack
       end
 
       def get_session(env, sid)
-        session = @stack[sid] if sid
-        @mutex.lock if env['rack.multithread']
-        unless sid && session
-          env['rack.errors'].puts(
-            "Session '#{sid.inspect}' not found, initializing..."
-          ) if $VERBOSE && !sid.nil?
-          sid, session = generate_sid, {}
-          @stack.create(sid, session)
+        unless sid && session = @stack[sid]
+          @stack.create(sid = generate_sid, session = {})
         end
+
         session.instance_variable_set('@old', {}.merge(session))
+      
         return [sid, session]
-      ensure
-        @mutex.unlock if env['rack.multithread']
       end
 
-      def set_session(env, sid, new_session, options)
-        @mutex.lock if env['rack.multithread']
-        session = @stack[sid] || {}
-        if options[:renew] || options[:drop]
+      def set_session(env, sid, session, options)
+        if options[:drop]
           @stack.delete(sid)
-          return false if options[:drop]
-          sid = generate_sid
-          @stack.create(sid, session)
+          return nil
         end
-        old_session = new_session.instance_variable_get('@old') || {}
-        session = merge_sessions(sid, old_session, new_session, session)
-        @stack[sid] = session
+
+        if options[:renew]
+          @stack.delete(sid)
+          @stack.create(sid = generate_sid, session)
+        else
+          old = session.instance_variable_get('@old') || {}
+          @stack[sid] = session if session != old
+        end
+
         return sid
-      ensure
-        @mutex.unlock if env['rack.multithread']
       end
-
-      def merge_sessions(sid, old, new, cur=nil)
-        cur ||= {}
-
-        unless old.is_a?(Hash) && new.is_a?(Hash)
-          warn('Bad old or new sessions provided.')
-          return cur
-        end
-
-        delete = old.keys - new.keys
-        if $VERBOSE && !delete.empty?
-          warn("//@#{sid}: delete #{delete*','}")
-        end
-        delete.each{|k| cur.delete k }
-
-        update = new.keys.select{|k| new[k] != old[k] }
-        if $VERBOSE && !update.empty?
-          warn("//@#{sid}: update #{update*','}")
-        end
-        update.each{|k| cur[k] = new[k] }
-
-        cur
-      end
-      private :merge_sessions
 
       class Base
         PARAMS = {}
