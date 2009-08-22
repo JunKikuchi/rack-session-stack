@@ -8,10 +8,6 @@ class Rack::Session::Stack::Sequel < Rack::Session::Stack::Base
     @pool = @params[:dataset]
   end
 
-  def key?(sid)
-    @pool.filter('sid = ?', sid).count == 1 || super
-  end
-
   def create(sid, session)
     @pool.insert(
       :sid     => sid,

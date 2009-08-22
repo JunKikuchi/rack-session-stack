@@ -1,4 +1,5 @@
 require 'rack/session/abstract/id'
+require 'uuidtools'
 
 module Rack
   module Session
@@ -11,10 +12,7 @@ module Rack
       end
 
       def generate_sid
-        loop do
-          sid = super
-          break sid unless @stack.key? sid
-        end
+        UUIDTools::UUID.random_create
       end
 
       def get_session(env, sid)
@@ -49,10 +47,6 @@ module Rack
 
         def initialize(params={}, fallback=nil)
           @params, @fallback = self.class::PARAMS.merge(params), fallback
-        end
-
-        def key?(sid)
-          @fallback && @fallback.key?(sid)
         end
 
         def create(sid, session)

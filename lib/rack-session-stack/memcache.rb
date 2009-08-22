@@ -10,10 +10,6 @@ class Rack::Session::Stack::Memcache < Rack::Session::Stack::Base
     raise 'No memcache servers' unless @pool.servers.any? { |s| s.alive? }
   end
 
-  def key?(sid)
-    @pool.get(sid, true)
-  end
-
   def create(sid, session)
     unless /^STORED/ =~ @pool.add(sid, session)
       raise "Session collision on '#{sid.inspect}'"

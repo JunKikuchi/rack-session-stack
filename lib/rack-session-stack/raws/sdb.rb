@@ -10,10 +10,6 @@ class Rack::Session::Stack::RAWS::SDB < Rack::Session::Stack::Base
     @pool = ::RAWS::SDB[@params[:domain]]
   end
 
-  def key?(sid)
-    @pool.get(sid) || super
-  end
-
   def create(sid, session)
     @pool.put(
       sid,
