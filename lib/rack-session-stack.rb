@@ -12,7 +12,7 @@ module Rack
       end
 
       def generate_sid
-        UUIDTools::UUID.random_create
+        UUIDTools::UUID.random_create.to_s
       end
 
       def get_session(env, sid)

@@ -6,7 +6,7 @@
 
 これは 3 段重ねの極端な例です。あらかじめご了承下さい。
 
-セッション情報を書き込む場合は Memcache と Sequel, RAWS::SDB の全てに書き込みます。
+セッション情報を書き込む場合は Memcache と Sequel, RAWS::SDB (Ruby Amazon Web Service - SimpleDB) の全てに書き込みます。
 
 セッション情報を読み込む場合は、最初に Memcache から読み込みます。データが取得出来れば Memcache のデータを使い、データが取得出来なかった場合は Sequel からデータを読み込んで使います。Sequel からデータを取得出来なかった場合は RAWS::SDB へと同様にフォールバックします。
 
