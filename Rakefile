@@ -1,26 +1,25 @@
 require 'rubygems'
-require 'rake/gempackagetask'
 require 'spec/rake/spectask'
 
 NAME = 'rack-session-stack'
-VERS = '0.0.1'
 
-desc 'Packages rack-session-stack'
-spec = Gem::Specification.new do |s|
-  s.name = NAME
-  s.version = VERS
-  s.platform = Gem::Platform::RUBY
-  s.summary = "rack-session-stack"
-  s.description = s.summary
-  s.author = "Jun Kikuchi"
-  s.email = "kikuchi@bonnou.com"
-  s.homepage = "http://bonnou.com/"
-  s.files = %w(COPYING CHANGELOG README.rdoc Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")
-  s.require_path = "lib"
-  s.has_rdoc = true
-end
-
-Rake::GemPackageTask.new(spec) do |pkg|
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |s|
+    s.name = NAME
+    s.platform = Gem::Platform::RUBY
+    s.summary = NAME
+    s.description = NAME
+    s.author = "Jun Kikuchi"
+    s.email = "kikuchi@bonnou.com"
+    s.homepage = "http://github.com/JunKikuchi/rack-session-stack"
+    s.files = %w(COPYING CHANGELOG README.rdoc Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")
+    s.require_path = "lib"
+    s.has_rdoc = true
+    s.add_dependency('uuidtools','>= 2.0.0')
+  end
+rescue LoadError
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
 
 Spec::Rake::SpecTask.new do |t|
