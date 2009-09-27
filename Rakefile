@@ -13,7 +13,7 @@ begin
     s.author = "Jun Kikuchi"
     s.email = "kikuchi@bonnou.com"
     s.homepage = "http://github.com/JunKikuchi/rack-session-stack"
-    s.files = %w(COPYING CHANGELOG README.rdoc Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")
+    s.files = %w(COPYING CHANGELOG README.rdoc Rakefile VERSION) + Dir.glob("{bin,doc,spec,lib}/**/*")
     s.require_path = "lib"
     s.has_rdoc = true
     s.add_dependency('uuidtools','>= 2.0.0')

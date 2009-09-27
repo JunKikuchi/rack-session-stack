@@ -47,7 +47,9 @@ class Rack::Session::Stack::RAWS::SDB < Rack::Session::Stack::Base
     if data = @pool.get(sid)
       Marshal.load(data['session'].unpack("m*").first)
     else
-      store(sid, super)
+      if data = super
+        create(sid, data)
+      end
     end
   end
 
