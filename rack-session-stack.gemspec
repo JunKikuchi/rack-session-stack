@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rack-session-stack}
-  s.version = "0.0.2"
+  s.version = "0.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jun Kikuchi"]
-  s.date = %q{2009-08-28}
+  s.date = %q{2009-09-27}
   s.description = %q{rack-session-stack}
   s.email = %q{kikuchi@bonnou.com}
   s.extra_rdoc_files = [
@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
      "COPYING",
      "README.rdoc",
      "Rakefile",
+     "VERSION",
      "lib/rack-session-stack.rb",
      "lib/rack-session-stack/memcache.rb",
      "lib/rack-session-stack/raws/sdb.rb",
